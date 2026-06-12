@@ -1,0 +1,16 @@
+{
+  "name": "aopiya-tools",
+  "version": "1.0.0",
+  "private": true,
+  "description": "AOPIYA 独立站运维工具包（CLI / SDK / Agent Skills）",
+  "scripts": {
+    "build": "pnpm sdk:build && pnpm cli:build",
+    "sdk:build": "pnpm --filter @aopiya/sdk build",
+    "cli:build": "pnpm --filter @aopiya/cli build",
+    "aopiya:install": "node scripts/install.mjs"
+  },
+  "engines": {
+    "node": "20.x"
+  },
+  "packageManager": "pnpm@9.15.0"
+}

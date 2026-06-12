@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+# AOPIYA CLI 入口（由 install.mjs 部署到 ~/.local/share/aopiya-tools/bin/）
+set -euo pipefail
+SOURCE="${BASH_SOURCE[0]}"
+while [ -L "$SOURCE" ]; do
+  DIR="$(cd "$(dirname "$SOURCE")" && pwd)"
+  SOURCE="$(readlink "$SOURCE")"
+  [[ "$SOURCE" != /* ]] && SOURCE="$DIR/$SOURCE"
+done
+ROOT="$(cd "$(dirname "$SOURCE")/.." && pwd)"
+exec node "$ROOT/cli/dist/cli.js" "$@"

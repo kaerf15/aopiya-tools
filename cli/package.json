@@ -1,0 +1,21 @@
+{
+  "name": "@aopiya/cli",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "bin": {
+    "aopiya": "./dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "lint": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@aopiya/sdk": "workspace:*",
+    "commander": "^13.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.10",
+    "typescript": "^5.8.2"
+  }
+}
