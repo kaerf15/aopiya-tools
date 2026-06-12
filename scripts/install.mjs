@@ -1,10 +1,11 @@
 #!/usr/bin/env node
 /**
- * 全局安装 aopiya CLI（~/.local/share）并注册 Skills（~/.agents/skills）。
+ * 全局安装 aopiya CLI；Skills 默认装到项目 .agents/skills/。
  *
  * 用法（在 aopiya-tools 仓库根）：
- *   pnpm aopiya:install
- *   node scripts/install.mjs --skip-build
+ *   pnpm aopiya:install -- --project ~/my-workspace   # 默认行为：Skills 进项目
+ *   pnpm aopiya:install -- --global-skills            # Skills 进 ~/.agents/skills/
+ *   node scripts/install.mjs --skip-build --project <dir>
  */
 import { cp, mkdir, chmod, symlink, rm, readFile, writeFile, access } from "node:fs/promises";
 import { execSync } from "node:child_process";
@@ -16,12 +17,22 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(__dirname, "..");
 const toolsRoot = repoRoot;
 
-const skipBuild = process.argv.includes("--skip-build");
-const home = os.homedir();
+const argv = process.argv.slice(2);
+const skipBuild = argv.includes("--skip-build");
+const globalSkills = argv.includes("--global-skills");
 
+let projectDir = process.cwd();
+const projectIdx = argv.indexOf("--project");
+if (projectIdx !== -1 && argv[projectIdx + 1]) {
+  projectDir = path.resolve(argv[projectIdx + 1]);
+}
+
+const home = os.homedir();
 const targetRoot = path.join(home, ".local", "share", "aopiya-tools");
 const configDir = path.join(home, ".config", "aopiya");
-const skillsTarget = path.join(home, ".agents", "skills");
+const skillsTarget = globalSkills
+  ? path.join(home, ".agents", "skills")
+  : path.join(projectDir, ".agents", "skills");
 const localBin = path.join(home, ".local", "bin");
 
 function run(cmd, cwd = repoRoot) {
@@ -136,12 +147,16 @@ async function printNextSteps() {
 
   console.log("\n下一步：把 Key 交给 Agent，写入凭证并探活：");
   console.log(`  凭证: ${os.platform() === "win32" ? envPs1 : envFile}`);
-  console.log("  详见 aopiya-tools/README.md →「配置凭证」");
+  console.log("  详见 README.md");
 }
 
 async function main() {
   console.log("全局安装 CLI → ~/.local/share/aopiya-tools");
-  console.log("注册 Skills → ~/.agents/skills");
+  console.log(
+    globalSkills
+      ? "注册 Skills（全局）→ ~/.agents/skills"
+      : `注册 Skills（项目）→ ${skillsTarget}`,
+  );
   await deployCliSdk();
   await linkSkills();
   await registerBin();

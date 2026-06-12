@@ -4,10 +4,12 @@
 
 | 装好后在哪 | 路径 |
 |-----------|------|
-| CLI | `~/.local/share/aopiya-tools/` |
+| CLI（全局） | `~/.local/share/aopiya-tools/` |
 | 命令 | `~/.local/bin/aopiya` |
-| Skills | `~/.agents/skills/aopiya-content`、`aopiya-analytics` |
-| 凭证 | `~/.config/aopiya/env.sh`（Win 用 `env.ps1`） |
+| Skills（**默认项目**） | `<项目根>/.agents/skills/aopiya-*` |
+| 凭证（全局） | `~/.config/aopiya/env.sh`（Win 用 `env.ps1`） |
+
+CLI 仅全局安装；**Skills 默认装进 Agent 工作项目的 `.agents/skills/`**（可选 `--global-skills` 装到 `~/.agents/skills/`）。
 
 ## API Key
 
@@ -25,27 +27,27 @@
 把下面整段发给 Agent，把 `[...]` 换成你的实际情况（Key 由管理员提供后粘贴）：
 
 ```text
-请在本机完成 AOPIYA 工具傻瓜式安装，按本仓库 README.md 执行，不要跳过任何一步。
+请在本机完成 AOPIYA 工具傻瓜式安装，按下列步骤执行，不要跳过。
 
 【环境】
 - 系统：macOS / Linux / Windows（我的是：[填写，如 macOS + zsh]）
-- 项目仓库：https://github.com/kaerf15/aopiya-tools（公开）
-- 本机路径：[填写，默认 ~/aopiya-tools]（目录不存在则先执行：git clone https://github.com/kaerf15/aopiya-tools.git ~/aopiya-tools）
+- 工具仓库：https://github.com/kaerf15/aopiya-tools（公开）
+- 工具本机路径：[填写，默认 ~/aopiya-tools]（没有则：git clone https://github.com/kaerf15/aopiya-tools.git ~/aopiya-tools）
+- Agent 工作项目路径：[填写项目根目录，Skills 将装到 <项目>/.agents/skills/]
 - Key 用途：[内容+数据 用 Full / 仅分析 用 Analytics]
 - Key 明文：[粘贴 Key]
 
 【你要做的事】
-0. 确认本机已有仓库目录；没有则 git clone 到上述路径
-1. cd 到仓库根目录，执行 pnpm install && pnpm aopiya:install
+1. cd 工具仓库根目录，执行 pnpm install && pnpm aopiya:install -- --project <Agent 工作项目路径>
 2. 若找不到 aopiya 命令，把 ~/.local/bin 加入 PATH 并 source shell 配置
 3. 写入持久化凭证（chmod 600）：
    - macOS/Linux → ~/.config/aopiya/env.sh，并在 ~/.zshrc 或 ~/.bashrc 自动 source
    - Windows → ~/.config/aopiya/env.ps1，并写入 PowerShell $PROFILE 自动加载
    - 内容：AOPIYA_API_BASE=https://www.aopiya.com/api/v1，AOPIYA_API_KEY=上面的 Key
 4. 执行 aopiya health，把完整 JSON 输出贴给我；失败则自行排查到成功
-5. 确认 ~/.agents/skills/ 下已有 aopiya-content、aopiya-analytics
+5. 确认 <Agent 工作项目路径>/.agents/skills/ 下已有 aopiya-content、aopiya-analytics
 
-完成后简短汇报：安装路径、凭证文件位置、health 是否 ok。
+完成后简短汇报：CLI 路径、Skills 路径、凭证文件位置、health 是否 ok。
 ```
 
 ---
@@ -53,8 +55,9 @@
 ## Agent 执行参考（给人看）
 
 ```bash
-git clone https://github.com/kaerf15/aopiya-tools.git ~/aopiya-tools   # 首次
-cd ~/aopiya-tools && pnpm install && pnpm aopiya:install
+git clone https://github.com/kaerf15/aopiya-tools.git ~/aopiya-tools
+cd ~/aopiya-tools && pnpm install
+pnpm aopiya:install -- --project ~/你的项目根目录
 ```
 
 ## Skill 与文档
