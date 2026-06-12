@@ -28,8 +28,11 @@
 
 ## 数据注意
 
-- `aopiya analytics traffic` 读**最新一条**快照；`aopiya analytics snapshots` 是历次 sync 追加的历史记录，供趋势分析。
-- 每次 sync 是**滚动 28 天窗口**，不是自然月；自然月分析用 `aopiya leads list --from --to` 或按日 payload 自行聚合。
+- 每个 `source + metric` **仅一条当前状态**（覆盖写入，无历史审计快照）；`aopiya analytics snapshots` 列出这些状态行。
+- **日维度（GA4 traffic、GSC search_trend 等）**：每次 sync 拉滚动 28 天，与库内状态**按 date 覆盖合并**，**长期积累**（不裁剪）；重合日期以本次拉取为准。
+- **窗口聚合（channels、pages、queries Top 等）**：每次 sync 整窗重拉，覆盖写入该指标状态。
+- **Vercel Drain**：事件流按日**累加**合并到 `pageviews` 状态。
+- 展示默认看最近 28 天；自然月分析用 `aopiya leads list --from --to` 或按日 payload 自行聚合。
 - SEO 品牌词：AOPIYA（奥比亚）、Susen、Chrisbella、Bagco；`handbag manufacturer`、`oem bags` 等品类词归**非品牌**，用于看新客发现能力。
 - 未配 Google 凭证的环境 `aopiya analytics sync` 返回 `mode: mock`，数据不可用于真实分析。
 
@@ -50,18 +53,29 @@
 | `/news`、`/news/[slug]` | article |
 | `/faq`、`/thanks`、法务页 | other |
 
+## 看板工作流附件
+
+与 Admin 六 Tab 对齐的分析配方见 `../workflows/README.md`。派生命令与本表同口径；灵活切片见 `../workflows/_building-blocks.md`。
+
 ## 返回结构速览（关键字段）
 
 | 命令 | 返回 JSON 结构 |
 |------|----------------|
-| `aopiya analytics traffic` | `{ periodDays, snapshotId, period: {start, end}, statsStartDate, data: [{date, sessions, users}] }` |
-| `aopiya analytics snapshots` | `{ count, items: [{id, source, metric, periodStart, periodEnd, createdAt, dataMode, payload: {rows: [...]}}] }` |
+| `aopiya analytics traffic` | `{ periodDays, snapshotId, period: {start,end} 展示窗, storedPeriod: {start,end} 库内日序列, statsStartDate, data: [{date, sessions, users}] }` |
+| `aopiya analytics search-trend` | `{ periodDays, snapshotId, period, storedPeriod, totals: {clicks, impressions, ctr, position}, rows: [{date, clicks, impressions, ctr, position}] }` |
+| `aopiya analytics snapshots` | `{ count, items: [{id, source, metric, periodStart, periodEnd, createdAt, dataMode, merge?, granularity?, rowCount?, payload}] }`（每指标一条当前状态，非历史列表） |
 | `aopiya analytics channels` | `{ periodDays, snapshotId, rows: [...] }` |
 | `aopiya analytics funnel` | `{ periodDays, dataMode, steps: [{step, count, rateFromPrev}], note? }` |
-| `aopiya analytics pages` | `{ items: [{pagePath, views, sessions, users}] }` |
+| `aopiya analytics pages` | `{ periodDays, snapshotId, period, pageType?, dataMode, items: [{pagePath, views, sessions, users}] }` |
+| `aopiya analytics channel-performance` | `{ periodDays, dataMode, sessionsTotal, items: [{channel, sessions, sessionsShare, leads, lead_cvr, leadSource}] }` |
 | `aopiya analytics content-performance` | `{ items: [{content_id, content_slug, page_path, page_type, sessions, views, users, leads, lead_cvr, gsc_clicks, gsc_impressions}] }` |
 | `aopiya analytics gsc-queries` | `{ snapshotId, items: [{query, clicks, impressions, ctr, position}] }` |
 | `aopiya analytics gsc-pages` | `{ snapshotId, items: [{page, clicks, impressions, ...}] }` |
+| `aopiya analytics search-trend` | 同 `getSearchTrend`：`totals` + `rows[{date, clicks, impressions, ctr, position}]` |
+| `aopiya analytics search-brand-split` | `{ brand, nonBrand, brandClickShare, nonBrandTop[] }` |
+| `aopiya analytics vercel-baseline` | `{ pageviewsTotal, uniqueDevices, daily[], items[], referrers[], countries[], locales[] }` |
+| `aopiya analytics coverage` | `{ vercelPageviews, ga4Sessions, overlapDays, ga4SessionsOverlap, vercelPageviewsOverlap, coverageRatio, vercelLastIngest }` |
+| `aopiya analytics meta` | `{ periodDays, displayPeriod, statsStartDate, dataMode, isLive, storage, ga4?, gscQueries?, gscSearchTrend?, configured, hint, syncedAt }` |
 | `aopiya leads list` | `{ count, items: [{id, name, country, company, phone, email, message, sourcePage, locale, utmSource, utmMedium, utmCampaign, createdAt}] }` |
 | `aopiya leads stats` | `{ total, bySourcePage: {路径: 数量}, byLocale: {语种: 数量}, from?, to? }` |
 

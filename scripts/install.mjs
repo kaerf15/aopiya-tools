@@ -1,13 +1,13 @@
 #!/usr/bin/env node
 /**
- * 全局安装 aopiya CLI；Skills 默认装到项目 .agents/skills/。
+ * 全局安装 aopiya CLI；Skills 默认复制到项目 .agents/skills/（非软链接）。
  *
  * 用法（在 aopiya-tools 仓库根）：
  *   pnpm aopiya:install -- --project ~/my-workspace   # 默认行为：Skills 进项目
  *   pnpm aopiya:install -- --global-skills            # Skills 进 ~/.agents/skills/
  *   node scripts/install.mjs --skip-build --project <dir>
  */
-import { cp, mkdir, chmod, symlink, rm, readFile, writeFile, access } from "node:fs/promises";
+import { cp, mkdir, chmod, rm, readFile, writeFile, access } from "node:fs/promises";
 import { execSync } from "node:child_process";
 import path from "node:path";
 import os from "node:os";
@@ -89,20 +89,32 @@ async function deployCliSdk() {
   }
 }
 
+async function deployAgentsMd() {
+  if (globalSkills) return;
+  const src = path.join(toolsRoot, "README.md");
+  if (!(await exists(src))) return;
+  const dest = path.join(projectDir, "AGENTS.md");
+  if (await exists(dest)) {
+    const alt = path.join(projectDir, "AGENTS.aopiya-tools.md");
+    await cp(src, alt, { force: true });
+    console.log(`  项目已有 AGENTS.md，调度正文 → ${alt}`);
+    return;
+  }
+  await cp(src, dest, { force: true });
+  console.log(`  README.md → ${dest}`);
+}
+
 async function linkSkills() {
   await mkdir(skillsTarget, { recursive: true });
   const links = [
     ["aopiya-content", path.join(toolsRoot, "skills", "aopiya-content")],
     ["aopiya-analytics", path.join(toolsRoot, "skills", "aopiya-analytics")],
+    ["aopiya-market-intelligence", path.join(toolsRoot, "skills", "aopiya-market-intelligence")],
   ];
   for (const [name, src] of links) {
     const dest = path.join(skillsTarget, name);
     await rm(dest, { recursive: true, force: true });
-    if (os.platform() === "win32") {
-      await copyDir(src, dest);
-    } else {
-      await symlink(src, dest);
-    }
+    await copyDir(src, dest);
   }
 }
 
@@ -154,11 +166,12 @@ async function main() {
   console.log("全局安装 CLI → ~/.local/share/aopiya-tools");
   console.log(
     globalSkills
-      ? "注册 Skills（全局）→ ~/.agents/skills"
-      : `注册 Skills（项目）→ ${skillsTarget}`,
+      ? "复制 Skills（全局）→ ~/.agents/skills"
+      : `复制 Skills（项目）→ ${skillsTarget}`,
   );
   await deployCliSdk();
   await linkSkills();
+  await deployAgentsMd();
   await registerBin();
   await printNextSteps();
 }

@@ -104,26 +104,32 @@ export class AopiyaClient {
     return this.request(`/content/${type}/${id}`);
   }
 
+  /** 新建内容行；同 slug 已有语种时继承其 status / publishedAt */
   contentCreate(type: string, body: unknown) {
     return this.request(`/content/${type}`, { method: "POST", body: JSON.stringify(body) });
   }
 
+  /** 局部更新（可只 PATCH 某 locale 的 data/seo 译文字段）；body 含 status 时同步该 slug 全部语种 */
   contentPatch(type: string, id: string, body: unknown) {
     return this.request(`/content/${type}/${id}`, { method: "PATCH", body: JSON.stringify(body) });
   }
 
+  /** 发布：同一 slug 的全部语种行同步为 published（id 通常传英文行） */
   contentPublish(type: string, id: string) {
     return this.request(`/content/${type}/${id}/publish`, { method: "POST" });
   }
 
+  /** 下线：同一 slug 的全部语种行同步为 draft */
   contentUnpublish(type: string, id: string) {
     return this.request(`/content/${type}/${id}/unpublish`, { method: "POST" });
   }
 
+  /** 删除：同一 slug 的全部语种行（id 通常传英文行，不可恢复） */
   contentDelete(type: string, id: string) {
     return this.request(`/content/${type}/${id}`, { method: "DELETE" });
   }
 
+  /** 批量 upsert；publish:true 时对该条 slug 全部已有语种同步 published */
   contentBulk(items: { type: string; body: unknown; publish?: boolean }[]) {
     return this.request("/content/bulk", {
       method: "POST",
@@ -256,8 +262,9 @@ export class AopiyaClient {
     return this.request(`/analytics/snapshots${suffix}`);
   }
 
-  analyticsTrafficCompare(offsetSnapshots = 1) {
-    return this.request(`/analytics/traffic/compare?offsetSnapshots=${offsetSnapshots}`);
+  /** 近 N 天 vs 前 N 天（同一日序列内环比） */
+  analyticsTrafficCompare(periodDays = 28) {
+    return this.request(`/analytics/traffic/compare?periodDays=${periodDays}`);
   }
 
   searchQueries(limit = 20) {
@@ -266,6 +273,46 @@ export class AopiyaClient {
 
   searchPages(limit = 20) {
     return this.request(`/analytics/search/pages?limit=${limit}`);
+  }
+
+  analyticsSearchTrend(periodDays = 28) {
+    return this.request(`/analytics/search/trend?periodDays=${periodDays}`);
+  }
+
+  analyticsSearchBrandSplit() {
+    return this.request("/analytics/search/brand-split");
+  }
+
+  analyticsSearchKeywordBreakdown() {
+    return this.request("/analytics/search/keyword-breakdown");
+  }
+
+  analyticsSearchKeywordTrend(periodDays = 28) {
+    return this.request(`/analytics/search/keyword-trend?periodDays=${periodDays}`);
+  }
+
+  analyticsGeoCountries(limit = 20) {
+    return this.request(`/analytics/geo/countries?limit=${limit}`);
+  }
+
+  analyticsGeoDevices() {
+    return this.request("/analytics/geo/devices");
+  }
+
+  analyticsGeoNewVsReturning() {
+    return this.request("/analytics/geo/new-vs-returning");
+  }
+
+  analyticsVercelBaseline(periodDays = 28) {
+    return this.request(`/analytics/vercel/baseline?periodDays=${periodDays}`);
+  }
+
+  analyticsCoverage(periodDays = 28) {
+    return this.request(`/analytics/coverage?periodDays=${periodDays}`);
+  }
+
+  analyticsMeta(periodDays = 28) {
+    return this.request(`/analytics/meta?periodDays=${periodDays}`);
   }
 
   auditRun() {

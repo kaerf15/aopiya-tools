@@ -47,7 +47,7 @@ content
   .argument("<type>", "article | product | video | …")
   .option("--status <status>", "draft | review | published | archived")
   .option("--locale <locale>", "en | fr | ar | es | pt | id | it | th | vi")
-  .description("列出内容（可按状态/语种过滤）")
+  .description("列出内容（可按状态/语种过滤；同 slug 各语种 status 一致）")
   .action(async (type, opts) => {
     printJson(await client.contentList(type, { status: opts.status, locale: opts.locale }));
   });
@@ -74,7 +74,7 @@ content
   .argument("<type>")
   .option("--file <path>", "JSON body 文件（{ slug, locale, templateId?, data, seo }）")
   .option("--data <json>", "JSON body 字符串")
-  .description("创建内容（默认 draft；未给 --file/--data 时读 stdin）")
+  .description("创建内容（默认 draft；同 slug 已有语种时继承其状态；未给 --file/--data 时读 stdin）")
   .action(async (type, opts) => {
     printJson(await client.contentCreate(type, readJsonInput(opts)));
   });
@@ -85,7 +85,7 @@ content
   .argument("<id>")
   .option("--file <path>", "JSON patch 文件（slug/templateId/data/seo/status 任意子集）")
   .option("--data <json>", "JSON patch 字符串")
-  .description("局部更新内容（未给 --file/--data 时读 stdin）")
+  .description("局部更新（可只 PATCH 某语种 data/seo 译文字段；含 status 时同步全 slug 语种）")
   .action(async (type, id, opts) => {
     printJson(await client.contentPatch(type, id, readJsonInput(opts)));
   });
@@ -94,7 +94,7 @@ content
   .command("publish")
   .argument("<type>")
   .argument("<id>")
-  .description("发布上线")
+  .description("发布上线（同一 slug 全部语种同步为 published，id 通常用英文行）")
   .action(async (type, id) => {
     printJson(await client.contentPublish(type, id));
   });
@@ -103,7 +103,7 @@ content
   .command("unpublish")
   .argument("<type>")
   .argument("<id>")
-  .description("下架（回到 draft）")
+  .description("下架为 draft（同一 slug 全部语种同步）")
   .action(async (type, id) => {
     printJson(await client.contentUnpublish(type, id));
   });
@@ -112,7 +112,7 @@ content
   .command("delete")
   .argument("<type>")
   .argument("<id>")
-  .description("删除内容（不可恢复）")
+  .description("删除内容（同一 slug 全部语种，不可恢复）")
   .action(async (type, id) => {
     printJson(await client.contentDelete(type, id));
   });
@@ -121,7 +121,7 @@ content
   .command("bulk")
   .option("--file <path>", "JSON 文件：{ items: [{ type, body, publish? }] } 或数组")
   .option("--data <json>", "JSON 字符串")
-  .description("批量 upsert（未给 --file/--data 时读 stdin）")
+  .description("批量 upsert（publish:true 对该 slug 全语种生效；未给 --file/--data 时读 stdin）")
   .action(async (opts) => {
     const input = readJsonInput(opts) as
       | { items: { type: string; body: unknown; publish?: boolean }[] }
@@ -135,23 +135,23 @@ const analytics = program.command("analytics").description("GA4/GSC 快照与分
 analytics
   .command("traffic")
   .option("--days <n>", "period days", "28")
-  .description("近 N 天流量日序列（最新快照口径）")
+  .description("近 N 天流量日序列（当前状态）")
   .action(async (opts) => {
     printJson(await client.analyticsTraffic(Number(opts.days)));
   });
 
 analytics
   .command("traffic-compare")
-  .option("--offset <n>", "与第 N 次之前的 traffic 快照对比", "1")
-  .description("与历史快照环比")
+  .option("--days <n>", "对比窗口天数（近 N 天 vs 前 N 天）", "28")
+  .description("traffic 日序列环比")
   .action(async (opts) => {
-    printJson(await client.analyticsTrafficCompare(Number(opts.offset)));
+    printJson(await client.analyticsTrafficCompare(Number(opts.days)));
   });
 
 analytics
   .command("snapshots")
-  .description("历次 sync 快照（历史趋势分析）")
-  .option("--source <source>", "ga4 | gsc")
+  .description("各指标当前分析状态（每 source+metric 一条）")
+  .option("--source <source>", "ga4 | gsc | vercel")
   .option("--metric <metric>", "traffic | pages | funnel_events | queries | …")
   .option("--limit <n>", "max rows", "20")
   .option("--no-payload", "仅元数据，不含 payload")
@@ -288,6 +288,82 @@ analytics
   .description("GSC 落地页表现")
   .action(async (opts) => {
     printJson(await client.searchPages(Number(opts.limit)));
+  });
+
+analytics
+  .command("search-trend")
+  .option("--days <n>", "period days", "28")
+  .description("GSC 搜索点击/展示日趋势")
+  .action(async (opts) => {
+    printJson(await client.analyticsSearchTrend(Number(opts.days)));
+  });
+
+analytics
+  .command("search-brand-split")
+  .description("GSC 品牌词 vs 非品牌词")
+  .action(async () => {
+    printJson(await client.analyticsSearchBrandSplit());
+  });
+
+analytics
+  .command("search-keyword-breakdown")
+  .description("GSC 搜索词类型分布（品牌/品类/OEM 等）")
+  .action(async () => {
+    printJson(await client.analyticsSearchKeywordBreakdown());
+  });
+
+analytics
+  .command("search-keyword-trend")
+  .option("--days <n>", "period days", "28")
+  .description("GSC 按词类型的日趋势")
+  .action(async (opts) => {
+    printJson(await client.analyticsSearchKeywordTrend(Number(opts.days)));
+  });
+
+analytics
+  .command("geo-countries")
+  .option("--limit <n>", "max rows", "20")
+  .description("GA4 国家分布（可分析口径）")
+  .action(async (opts) => {
+    printJson(await client.analyticsGeoCountries(Number(opts.limit)));
+  });
+
+analytics
+  .command("geo-devices")
+  .description("GA4 设备分布（可分析口径）")
+  .action(async () => {
+    printJson(await client.analyticsGeoDevices());
+  });
+
+analytics
+  .command("geo-new-vs-returning")
+  .description("GA4 新老访客")
+  .action(async () => {
+    printJson(await client.analyticsGeoNewVsReturning());
+  });
+
+analytics
+  .command("vercel-baseline")
+  .option("--days <n>", "period days", "28")
+  .description("Vercel 全量 PV、日趋势、Top 路径/来源/国家/语种")
+  .action(async (opts) => {
+    printJson(await client.analyticsVercelBaseline(Number(opts.days)));
+  });
+
+analytics
+  .command("coverage")
+  .option("--days <n>", "period days", "28")
+  .description("全量 vs 可分析覆盖占比（日期重叠窗口）")
+  .action(async (opts) => {
+    printJson(await client.analyticsCoverage(Number(opts.days)));
+  });
+
+analytics
+  .command("meta")
+  .option("--days <n>", "period days", "28")
+  .description("看板元信息：数据模式、展示窗、各指标新鲜度")
+  .action(async (opts) => {
+    printJson(await client.analyticsMeta(Number(opts.days)));
   });
 
 analytics

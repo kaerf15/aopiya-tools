@@ -142,7 +142,7 @@ CLI 给指标和 CMS 原文；线上 URL 用于核对**实际渲染**是否与 C
 3. 核对 `<title>`、meta description、H1、CTA、JSON-LD、hreflang
 4. 与 `aopiya analytics` / GSC 数据交叉验证
 
-检查项详见 `methodology.md`「页面级审计清单」。
+检查项与报告模板见 `../workflows/page-audit.md`、`page-audit-checklist.md`。
 
 ## 全站内容分析工作流
 
@@ -166,7 +166,7 @@ aopiya leads stats
 aopiya audit sitemap
 aopiya audit run -o audit.json
 
-# 4. 对 Top N 问题页逐条：content get + 打开线上 URL 做页面审计
+# 4. 对 Top N 问题页逐条走 page-audit.md（content get + 线上 URL）
 ```
 
 输出建议格式（每条）：
@@ -175,7 +175,7 @@ aopiya audit run -o audit.json
 - **数据**：sessions / leads / GSC clicks / CTR
 - **CMS 问题**：title 超长、description 缺失、译稿未本地化等
 - **前端问题**：H1 重复、CTA 不可见、Schema 缺失等
-- **动作**：改 CMS（`aopiya-content`）/ 改 SEO 字段 / 补内链 / 新写文章
+- **动作**：输出改稿建议（URL、CMS id、SEO 字段、内链、待新写文章题）
 
 ## 后台页面（不计入分析）
 

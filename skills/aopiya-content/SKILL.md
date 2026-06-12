@@ -13,8 +13,6 @@ description: >-
 
 > **唯一操作入口**：只用 `aopiya` 命令。
 
-流量与转化分析见可选配套 Skill：`aopiya-analytics`。
-
 ## 参考文档（本 Skill 目录，按需读）
 
 | 文档 | 何时读 |
@@ -78,7 +76,8 @@ aopiya content bulk --file items.json
 
 | 操作 | 所需 scope |
 |------|-----------|
-| list / get / schema | `content:read` |
+| list / get | `content:read` |
+| schema | 无需 auth（公开） |
 | create / update / delete / bulk | `content:write` |
 | publish / unpublish | `content:publish` |
 | media list / upload / register | `media:read` / `media:write` |
@@ -89,7 +88,3 @@ aopiya content bulk --file items.json
 
 - 未经用户确认就 `content delete` 或改动 `page` / `site_settings`
 - 跳过 draft 直接构造 published；发布保持显式 `publish` 命令
-
-## 可选配套
-
-- `aopiya-analytics`：分析独立站流量/询盘/SEO，含全站内容与页面审计（`references/site-pages.md`）；本 Skill 负责把结论落地为 CMS 改动
