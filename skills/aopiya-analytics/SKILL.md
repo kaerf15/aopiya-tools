@@ -62,6 +62,21 @@ aopiya-analytics/
 
 双口径不可混减；漏斗终点以询盘库为准。详见 `metrics.md`。
 
+## 日维度（`*_daily`）
+
+除窗口 Top（`rows` / `items`）外，多数指标另有 **按日分桶** 快照（metric 后缀 `_daily`）：
+
+- **REST/CLI**：同一命令返回里多一个 **`daily`** 字段（`[{date, items}]` 或 `[{date, events}]`），已按 `--days` 裁剪。
+- **Vercel**：`vercel-baseline` 另有 **`dimensionsDaily`**（按日的 paths/referrers/countries/locales）。
+- **目录**：完整 metric 列表见 `references/snapshot-metrics.md`。
+- **趋势/下钻**：优先用 `daily`，不要用窗口 Top 冒充日序列。
+
+```bash
+aopiya analytics channels --days 28    # rows + daily
+aopiya analytics funnel --days 28      # steps + daily
+aopiya analytics vercel-baseline --days 28  # daily + dimensionsDaily
+```
+
 ## 命令速查
 
 | 场景 | 命令 |
@@ -69,7 +84,7 @@ aopiya-analytics/
 | 探活 | `aopiya health` |
 | 流量日序列 | `aopiya analytics traffic [--days 28]` |
 | 环比 | `aopiya analytics traffic-compare` / `traffic-wow` |
-| 指标状态 | `aopiya analytics snapshots [--no-payload]` |
+| 指标状态 / 日分桶原始 payload | `aopiya analytics snapshots [--no-payload]` |
 | 渠道 / 转化 | `aopiya analytics channels` / `channel-performance` |
 | 漏斗 | `aopiya analytics funnel` |
 | 页面 / 内容 | `aopiya analytics pages` / `content-performance` / `page-types` |

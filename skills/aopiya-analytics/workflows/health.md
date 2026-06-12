@@ -22,10 +22,11 @@ aopiya health
 1. **模式与展示窗**：`meta.dataMode`、`displayPeriod`、`ga4`/`gscSearchTrend` 库内日序列起止与 `rowCount`。
 2. **配置清单**：`meta.configured` — GA4 Property、GSC、前端 gtag、Vercel Drain。
 3. **指标状态表**：`snapshots.items` — 每行 `source, metric, merge, periodStart~End, rowCount, createdAt`。
-4. **全量基线**：`vercel-baseline` — pageviewsTotal、uniqueDevices、daily 趋势。
-5. **覆盖率**：`coverage` — `vercelPageviews`、`ga4Sessions`、`coverageRatio`（重叠日期窗）。
-6. **对账**：`reconcile` — GA4 `generate_lead` vs 询盘库 count；`ok` 布尔与 `note`。
-7. **Vercel Drain**：生产 endpoint `https://www.aopiya.com/api/v1/analytics/drains/vercel`（`health` / Admin 配置说明）。
+4. **全量基线**：`vercel-baseline` — pageviewsTotal、uniqueDevices、`daily` 全站 PV 趋势、`dimensionsDaily` 按日维度分桶。
+5. **日分桶状态**：`snapshots` 中 `*_daily`、`dimensions_daily` 的 `merge`（`overwrite_by_date_bucket` / `incremental_dimensions`）与 `rowCount`（天数）。
+6. **覆盖率**：`coverage` — `vercelPageviews`、`ga4Sessions`、`coverageRatio`（重叠日期窗）。
+7. **对账**：`reconcile` — GA4 `generate_lead` vs 询盘库 count；`ok` 布尔、`daily` 与 `note`。
+8. **Vercel Drain**：生产 endpoint `https://www.aopiya.com/api/v1/analytics/drains/vercel`（`health` / Admin 配置说明）。
 
 ## 输出模板
 

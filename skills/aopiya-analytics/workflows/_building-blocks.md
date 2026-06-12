@@ -26,10 +26,23 @@
 - **禁止**用全量减可分析、或混口径算占比（**例外**：`coverage` 覆盖率，仅在日期重叠窗内）。
 - **有效询盘**以 `leads` 库为准；GA4 `generate_lead` 仅对账。
 
+## 窗口 vs 日维度
+
+| 字段 | 含义 | 典型用途 |
+|------|------|----------|
+| `rows` / `items` | 上次 sync 的 **N 天窗口 Top 汇总** | 看板同款排名表 |
+| `daily` | **按日分桶**（`*_daily` 快照，长期积累） | 趋势、自然月聚合、按日下钻 |
+| `dimensionsDaily` | Vercel 按日 paths/referrers/countries/locales | 全量口径日趋势与分维度 |
+
+```bash
+aopiya analytics channels --days 28
+# rows：窗口渠道排名；daily：每天各 channel 的 sessions
+```
+
 ## 窗口聚合的限制
 
-`channels`、`pages`、`gsc-queries` 等是 **上次 sync 拉的固定 N 天窗**，API 不能改成 60 天窗。
-要更长窗口：先 `aopiya analytics sync --days 60`（勿高频），再读命令。
+`channels`、`pages`、`gsc-queries` 等的 **窗口 Top** 是上次 sync 拉的固定 N 天窗；**`daily` 日序列**可跨多次 sync 积累，用 `--days` 切展示窗。
+要更长窗口 Top：先 `aopiya analytics sync --days 60`（勿高频），再读命令。
 
 ## 新鲜度检查（任何分析前建议执行）
 
