@@ -9,11 +9,20 @@
 | Skills | `~/.agents/skills/aopiya-content`、`aopiya-analytics` |
 | 凭证 | `~/.config/aopiya/env.sh`（Win 用 `env.ps1`） |
 
+## API Key
+
+**由管理员提供**，不向仓库或公开渠道索取。拿到 Key 后交给 Agent 写入 `~/.config/aopiya/env.*`（勿提交 Git、勿写入日志）。
+
+| Key | 用途 |
+|-----|------|
+| Agent Full | 发商品 / 文章 / 视频 + 数据分析 |
+| Agent Analytics | 仅数据分析 |
+
 ---
 
 ## 丢给 Agent 的提示词（复制即用）
 
-把下面整段发给 Agent，把 `[...]` 换成你的实际情况（Key 从运营 / 后台 AI 指南拿）：
+把下面整段发给 Agent，把 `[...]` 换成你的实际情况（Key 由管理员提供后粘贴）：
 
 ```text
 请在本机完成 AOPIYA 工具傻瓜式安装，按本仓库 README.md 执行，不要跳过任何一步。
@@ -47,11 +56,6 @@
 git clone https://github.com/kaerf15/aopiya-tools.git ~/aopiya-tools   # 首次
 cd ~/aopiya-tools && pnpm install && pnpm aopiya:install
 ```
-
-| Key | 用途 |
-|-----|------|
-| Agent Full | 发商品 / 文章 / 视频 + 数据分析 |
-| Agent Analytics | 仅数据分析 |
 
 ## Skill 与文档
 
