@@ -20,8 +20,8 @@
 
 【环境】
 - 系统：macOS / Linux / Windows（我的是：[填写，如 macOS + zsh]）
-- 项目仓库：https://github.com/aopiya/aopiya-tools（公开）
-- 本机路径：[填写，默认 ~/aopiya-tools]（目录不存在则先执行：git clone https://github.com/aopiya/aopiya-tools.git ~/aopiya-tools）
+- 项目仓库：https://github.com/kaerf15/aopiya-tools（公开）
+- 本机路径：[填写，默认 ~/aopiya-tools]（目录不存在则先执行：git clone https://github.com/kaerf15/aopiya-tools.git ~/aopiya-tools）
 - Key 用途：[内容+数据 用 Full / 仅分析 用 Analytics]
 - Key 明文：[粘贴 Key]
 
@@ -44,7 +44,7 @@
 ## Agent 执行参考（给人看）
 
 ```bash
-git clone https://github.com/aopiya/aopiya-tools.git ~/aopiya-tools   # 首次
+git clone https://github.com/kaerf15/aopiya-tools.git ~/aopiya-tools   # 首次
 cd ~/aopiya-tools && pnpm install && pnpm aopiya:install
 ```
 
