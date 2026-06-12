@@ -254,9 +254,29 @@ analytics
 analytics
   .command("touchpoints")
   .option("--limit <n>", "max rows", "20")
-  .description("触点点击（CTA / WhatsApp / 卡片等）")
+  .description("触点点击（CTA / WhatsApp / 卡片等，子集）")
   .action(async (opts) => {
     printJson(await client.analyticsTouchpoints(Number(opts.limit)));
+  });
+
+analytics
+  .command("tracking-events")
+  .option("--days <n>", "period days", "28")
+  .option("--limit <n>", "max rows", "50")
+  .description("全量 trackEvent 埋点（含 page_view / scroll_depth / 漏斗 / 触点）")
+  .action(async (opts) => {
+    printJson(
+      await client.analyticsTrackingEvents(Number(opts.days), Number(opts.limit)),
+    );
+  });
+
+analytics
+  .command("scroll-depth")
+  .option("--days <n>", "period days", "28")
+  .option("--limit <n>", "max rows", "100")
+  .description("scroll_depth 原始档位（25/50/75/90 × 路径）")
+  .action(async (opts) => {
+    printJson(await client.analyticsScrollDepth(Number(opts.days), Number(opts.limit)));
   });
 
 analytics

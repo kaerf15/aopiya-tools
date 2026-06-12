@@ -86,6 +86,8 @@ aopiya analytics vercel-baseline --days 28  # daily + dimensionsDaily
 | 环比 | `aopiya analytics traffic-compare` / `traffic-wow` |
 | 指标状态 / 日分桶原始 payload | `aopiya analytics snapshots [--no-payload]` |
 | 渠道 / 转化 | `aopiya analytics channels` / `channel-performance` |
+| **全量埋点** | `aopiya analytics tracking-events`（含 page_view、scroll_depth、漏斗、触点） |
+| 滚动深度 | `aopiya analytics scroll-depth`（25/50/75/90）/ `scroll-engagement`（75% KPI） |
 | 漏斗 | `aopiya analytics funnel` |
 | 页面 / 内容 | `aopiya analytics pages` / `content-performance` / `page-types` |
 | SEO | `aopiya analytics search-trend` / `gsc-queries` / `search-brand-split`… |

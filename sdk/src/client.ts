@@ -227,6 +227,18 @@ export class AopiyaClient {
     return this.request(`/analytics/touchpoints?limit=${limit}`);
   }
 
+  analyticsTrackingEvents(periodDays = 28, limit = 50) {
+    return this.request(
+      `/analytics/tracking-events?periodDays=${periodDays}&limit=${limit}`,
+    );
+  }
+
+  analyticsScrollDepth(periodDays = 28, limit = 100) {
+    return this.request(
+      `/analytics/scroll-depth?periodDays=${periodDays}&limit=${limit}`,
+    );
+  }
+
   analyticsScrollEngagement(limit = 15) {
     return this.request(`/analytics/scroll-engagement?limit=${limit}`);
   }
