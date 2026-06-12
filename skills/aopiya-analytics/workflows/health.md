@@ -2,7 +2,7 @@
 
 **业务问题**：数据可信吗？新鲜吗？双口径是否可比？配置是否齐全？
 
-对应看板：Admin → 分析 → **数据健康**。
+对应看板：Admin → 分析 → **数据健康**。叙事层：**L5 数据可信 + L1 全量**（见 `../references/narrative-layers.md`）。
 
 ## 数据积木
 
@@ -14,24 +14,34 @@ aopiya analytics snapshots --no-payload --limit 40
 aopiya analytics vercel-baseline --days $DAYS
 aopiya analytics coverage --days $DAYS
 aopiya analytics reconcile --days $DAYS
+aopiya leads stats-daily --days $DAYS
+aopiya analytics tracking-events --days $DAYS --limit 50
 aopiya health
 ```
 
 ## 计算步骤
 
-1. **模式与展示窗**：`meta.dataMode`、`displayPeriod`、`ga4`/`gscSearchTrend` 库内日序列起止与 `rowCount`。
-2. **配置清单**：`meta.configured` — GA4 Property、GSC、前端 gtag、Vercel Drain。
-3. **指标状态表**：`snapshots.items` — 每行 `source, metric, merge, periodStart~End, rowCount, createdAt`。
-4. **全量基线**：`vercel-baseline` — pageviewsTotal、uniqueDevices、`daily` 全站 PV 趋势、`dimensionsDaily` 按日维度分桶。
-5. **日分桶状态**：`snapshots` 中 `*_daily`、`dimensions_daily` 的 `merge`（`overwrite_by_date_bucket` / `incremental_dimensions`）与 `rowCount`（天数）。
-6. **覆盖率**：`coverage` — `vercelPageviews`、`ga4Sessions`、`coverageRatio`（重叠日期窗）。
-7. **对账**：`reconcile` — GA4 `generate_lead` vs 询盘库 count；`ok` 布尔、`daily` 与 `note`。
-8. **Vercel Drain**：生产 endpoint `https://www.aopiya.com/api/v1/analytics/drains/vercel`（`health` / Admin 配置说明）。
+### 状态与配置
+
+1. **模式与展示窗**：`meta.dataMode`、`displayPeriod`、`ga4`/`gscSearchTrend` 库内日序列。
+2. **配置清单**：`meta.configured` — GA4、GSC、gtag、Vercel Drain。
+3. **指标状态表**：`snapshots.items` — `merge`、`rowCount`、`createdAt`；核对 `*_daily` 是否存在。
+4. **覆盖率（窗口）**：`coverage.coverageRatio`（重叠日期窗）。
+
+### 按日叙事（L5）
+
+5. **询盘对账日趋势**：外连接 `reconcile.daily`（GA4 generate_lead）与 `leads stats-daily.daily`（询盘库）— 双线应贴合；决策以库为准。
+6. **Cookie 同意日趋势**：`tracking-events` 中 `cookie_consent_choice` 的 `daily` 按日 count（或专用 cookie 聚合）。
+7. **全量 PV 日趋势（L1）**：`vercel-baseline.daily` — 验证 Drain 连续入库。
 
 ## 输出模板
 
 ```markdown
 ## 数据健康
+
+### 读数口径
+- 同步窗：GA4 {meta.syncWindows.ga4}；GSC {meta.syncWindows.gscQueries}；`periodLinkage` 见 meta
+- 【随所选周期】= 对账/Cookie/全量 PV 日趋势、覆盖重叠窗；【同步窗 Top】= —；【累计】= Vercel 路径/引荐 Top、快照状态表
 
 ### 配置
 | 项 | 状态 |
@@ -44,13 +54,20 @@ aopiya health
 ### 新鲜度
 - GA4 traffic 最近更新：{createdAt}
 - GSC search_trend：{createdAt}
-- 展示窗：近 {N} 天 {start}~{end}
+- 展示窗【随所选周期】：近 {N} 天 {displayPeriod.start}~{end}
+- 同步窗 Top 窗：GA4 {syncWindows.ga4}；GSC {syncWindows.gscQueries}
+- `*_daily` 日点数：{列举关键 metric rowCount}
 
-### 双口径覆盖
+### 按日叙事【随所选周期】
+- 对账：GA4 vs 库 {一致/差异日列表}
+- Cookie 同意：{趋势}
+- 全量 PV：{连续/断档}
+
+### 双口径覆盖【随所选周期·重叠窗】
 - 全量 PV：{n}；可分析 sessions：{n}；覆盖率：{x}%
 
-### 对账
-- {ok / 差异说明}
+### Vercel Top【累计】
+- 路径/引荐 Top 为接通 Drain 以来累计，不随 {N} 重算
 
 ### 行动项
 - {需 sync / 需配 Drain / 无需操作}
@@ -59,4 +76,4 @@ aopiya health
 ## 灵活偏离
 
 - 单指标深挖：`snapshots --metric X --source Y --limit 1` 看完整 payload。
-- 升级后冗余行：在 aopiya_web 执行 `pnpm analytics:consolidate-state -- --apply`（一次性）。
+- 升级前若 snapshots 同指标存在多条状态：联系站点运维做一次性状态合并，再 `aopiya analytics sync`。

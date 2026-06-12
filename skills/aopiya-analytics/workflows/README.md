@@ -40,6 +40,7 @@
 |------|------|
 | `workflows/`（本目录） | 看板**计算配方**、命令清单、报告输出模板 |
 | `references/metrics.md` | 口径宪法 |
+| `references/narrative-layers.md` | L0→L5 业务叙事 + **读数三层**（随所选周期 / 同步窗 Top / 累计）与各 Tab 日趋势字段 |
 | `references/methodology.md` | 报告**叙事结构**、SEO/GEO/舆情方法论 |
 | `references/page-audit-checklist.md` | 单页检查清单（按 page_type） |
 | `references/snapshot-metrics.md` | 快照 payload 字段目录 |

@@ -40,6 +40,7 @@ aopiya-analytics/
 | 文档 | 何时读 |
 |------|--------|
 | `references/metrics.md` | **必读**：口径、漏斗、返回结构 |
+| `references/narrative-layers.md` | **必读**：L0→L5 叙事层、各 Tab 日趋势字段 |
 | `workflows/README.md` | 看板配方索引 |
 | `workflows/_building-blocks.md` | 灵活切片、snapshots 自算 |
 | `references/snapshot-metrics.md` | 快照 payload 目录 |
@@ -58,9 +59,13 @@ aopiya-analytics/
 | **Vercel** 全量 PV | `vercel-baseline`、`traffic-compare`、`traffic-wow` |
 | **GA4** 可分析行为 | `traffic`、`channels`、`funnel`、`content-performance`… |
 | **GSC** 搜索 | `gsc-queries`、`search-trend`、`search-brand-split`… |
-| **询盘库** | `leads list` / `stats` / `export` |
+| **询盘库** | `leads list` / `stats` / `stats-daily` / `export` |
 
 双口径不可混减；漏斗终点以询盘库为准。详见 `metrics.md`。
+
+## 分析周期（7 / 28 / 90）
+
+看板与 CLI **仅三档**：`7` 周报 · `28` 月报（默认）· `90` 季度。切换后 **日趋势 / 周期 KPI** 联动；**窗口 Top（rows/items）** 绑上次 sync 窗不重算。读数三层见 `references/narrative-layers.md`；`aopiya analytics meta --days N` 返回 `syncWindows` 与 `periodLinkage`。
 
 ## 日维度（`*_daily`）
 
@@ -94,7 +99,7 @@ aopiya analytics vercel-baseline --days 28  # daily + dimensionsDaily
 | 获客 | `aopiya analytics geo-countries` / `geo-devices` / `ai-referrals` |
 | 全量 / 覆盖 | `aopiya analytics vercel-baseline` / `coverage` / `meta` |
 | 对账 / 同步 | `aopiya analytics reconcile` / `sync`（勿高频） |
-| 询盘 | `aopiya leads list` / `stats` / `export` |
+| 询盘 | `aopiya leads list` / `stats` / `stats-daily` / `export` |
 | 审计 | `aopiya audit run` / `audit sitemap` / `audit links` |
 
 ## Google 同步

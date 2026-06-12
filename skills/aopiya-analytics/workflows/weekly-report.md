@@ -40,6 +40,10 @@ aopiya analytics reconcile --days 28
 ```markdown
 # AOPIYA 独立站周报（{date_range}）
 
+### 读数口径
+- `aopiya analytics meta --days 7`：`syncWindows`、`periodLinkage.relation`
+- 各段标注【随所选周期】/【同步窗 Top】/【累计】，与看板徽章一致（见 `narrative-layers.md`）
+
 ## 1. 总览
 {overview 模板摘要 + 一句话健康度}
 

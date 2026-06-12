@@ -55,6 +55,24 @@
 | `/news`、`/news/[slug]` | article |
 | `/faq`、`/thanks`、法务页 | other |
 
+## 分析周期
+
+看板与 CLI 仅 **7 / 28 / 90** 三档（周报 / 月报 / 季度）。`periodDays` / `--days` 其它值归并到 28。`meta` 响应含 `periodPreset`（label、shortLabel、scene、compareNote）。
+
+## 读数三层（与看板徽章 / `meta.periodLinkage` 对齐）
+
+| 层级 | `periodDays` 裁剪？ | API / CLI 典型字段 |
+|------|---------------------|-------------------|
+| **随所选周期** | ✅ | `traffic.data`、`*.daily`、`search-trend.totals/rows`、`vercel-baseline.daily`/`pageviewsTotal`、`funnel.daily`、`leads stats --from`、`leads stats-daily` |
+| **同步窗 Top** | ❌（仅 daily 变） | `channels.rows`、`pages.items`、`search/queries.items`、`funnel.steps`（中间步）、`channel-performance.items.sessions` |
+| **累计** | ❌ | `vercel-baseline.items/referrers/countries`、`uniqueDevices`、`leads stats`（无 from/to） |
+
+读排名前执行 `aopiya analytics meta --days N`，对照 `syncWindows.ga4` / `syncWindows.gscQueries` 的 `periodStart~periodEnd` 与 `spanDays`；`periodLinkage.relation` 为 `narrower`（90 天常见）或 `wider`（7 天常见）时勿把窗口 Top 与周期日合计直接对比。
+
+## 叙事分层（L0→L5）
+
+看板与 Agent 报告采用 **「窗口 Top + 日趋势」** 双层叙事；层级定义、各 Tab 对应字段见 `narrative-layers.md`。写报告顺序：先 L0 询盘 → L1/L2 访问 → 按问题选 L3/L4 → 末 L5 可信度。
+
 ## 看板工作流附件
 
 与 Admin 六 Tab 对齐的分析配方见 `../workflows/README.md`。派生命令与本表同口径；灵活切片见 `../workflows/_building-blocks.md`。
@@ -78,11 +96,14 @@
 | `aopiya analytics gsc-pages` | `{ snapshotId, items[], daily[{date, items[{page, clicks, ...}]}] }` |
 | `aopiya analytics search-trend` | 同 `getSearchTrend`：`totals` + `rows[{date, clicks, impressions, ctr, position}]` |
 | `aopiya analytics search-brand-split` | `{ brand, nonBrand, brandClickShare, nonBrandTop[], daily[{date, brand, nonBrand}] }` |
+| `aopiya analytics reconcile` | `{ periodDays, ga4GenerateLead, dbLeads, delta, ok, dataMode, daily[{date, items:[{count}]}], note }` — `daily` 为日分桶，按日 sum `items[].count` |
 | `aopiya analytics vercel-baseline` | `{ pageviewsTotal, uniqueDevices, daily[], dimensionsDaily[{date, paths, referrers, countries, locales}], items[], referrers[], countries[], locales[] }` |
 | `aopiya analytics coverage` | `{ vercelPageviews, ga4Sessions, overlapDays, ga4SessionsOverlap, vercelPageviewsOverlap, coverageRatio, vercelLastIngest }` |
-| `aopiya analytics meta` | `{ periodDays, displayPeriod, statsStartDate, dataMode, isLive, storage, ga4?, gscQueries?, gscSearchTrend?, configured, hint, syncedAt }` |
+| `aopiya analytics meta` | `{ periodDays, periodPreset, displayPeriod, syncWindows{ga4,gscQueries}, periodLinkage, statsStartDate, dataMode, isLive, storage, ga4?, gscQueries?, gscSearchTrend?, configured, hint, syncedAt }` |
+| `aopiya leads stats-daily` | `{ periodDays, period, total, daily[{date, count}] }` |
 | `aopiya leads list` | `{ count, items: [{id, name, country, company, phone, email, message, sourcePage, locale, utmSource, utmMedium, utmCampaign, createdAt}] }` |
 | `aopiya leads stats` | `{ total, bySourcePage: {路径: 数量}, byLocale: {语种: 数量}, from?, to? }` |
+| `aopiya leads stats-daily` | `{ periodDays, period, total, daily[{date, count}] }` — L0 询盘日趋势（询盘库全量） |
 
 时间均为 ISO 8601 UTC 字符串；`sourcePage` / `page_path` 为站内路径（带语种前缀，归并规则见上节）。
 其余命令结构自描述，跑一次看输出即可；语义不明的字段对照本表理解。

@@ -253,61 +253,50 @@ analytics
 
 analytics
   .command("touchpoints")
-  .option("--limit <n>", "max rows", "20")
-  .description("触点点击（CTA / WhatsApp / 卡片等，子集）")
-  .action(async (opts) => {
-    printJson(await client.analyticsTouchpoints(Number(opts.limit)));
-  });
-
-analytics
-  .command("tracking-events")
   .option("--days <n>", "period days", "28")
-  .option("--limit <n>", "max rows", "50")
-  .description("全量 trackEvent 埋点（含 page_view / scroll_depth / 漏斗 / 触点）")
+  .option("--limit <n>", "max rows", "20")
+  .description("触点点击（CTA / WhatsApp / 卡片等）")
   .action(async (opts) => {
     printJson(
-      await client.analyticsTrackingEvents(Number(opts.days), Number(opts.limit)),
+      await client.analyticsTouchpoints(Number(opts.limit), Number(opts.days)),
     );
   });
 
 analytics
-  .command("scroll-depth")
-  .option("--days <n>", "period days", "28")
-  .option("--limit <n>", "max rows", "100")
-  .description("scroll_depth 原始档位（25/50/75/90 × 路径）")
-  .action(async (opts) => {
-    printJson(await client.analyticsScrollDepth(Number(opts.days), Number(opts.limit)));
-  });
-
-analytics
   .command("scroll-engagement")
+  .option("--days <n>", "period days", "28")
   .option("--limit <n>", "max rows", "15")
   .description("页面滚动深度")
   .action(async (opts) => {
-    printJson(await client.analyticsScrollEngagement(Number(opts.limit)));
+    printJson(
+      await client.analyticsScrollEngagement(Number(opts.limit), Number(opts.days)),
+    );
   });
 
 analytics
   .command("ai-referrals")
+  .option("--days <n>", "period days", "28")
   .description("AI 产品引荐访问（ChatGPT / Perplexity 等）")
-  .action(async () => {
-    printJson(await client.analyticsAiReferrals());
+  .action(async (opts) => {
+    printJson(await client.analyticsAiReferrals(Number(opts.days)));
   });
 
 analytics
   .command("gsc-queries")
+  .option("--days <n>", "period days", "28")
   .option("--limit <n>", "max rows", "20")
-  .description("GSC 搜索词表现")
+  .description("GSC 搜索词表现（items=同步窗 Top；daily 随 --days）")
   .action(async (opts) => {
-    printJson(await client.searchQueries(Number(opts.limit)));
+    printJson(await client.searchQueries(Number(opts.limit), Number(opts.days)));
   });
 
 analytics
   .command("gsc-pages")
+  .option("--days <n>", "period days", "28")
   .option("--limit <n>", "max rows", "20")
-  .description("GSC 落地页表现")
+  .description("GSC 落地页表现（items=同步窗 Top；daily 随 --days）")
   .action(async (opts) => {
-    printJson(await client.searchPages(Number(opts.limit)));
+    printJson(await client.searchPages(Number(opts.limit), Number(opts.days)));
   });
 
 analytics
@@ -320,16 +309,18 @@ analytics
 
 analytics
   .command("search-brand-split")
-  .description("GSC 品牌词 vs 非品牌词")
-  .action(async () => {
-    printJson(await client.analyticsSearchBrandSplit());
+  .option("--days <n>", "period days", "28")
+  .description("GSC 品牌词 vs 非品牌词（窗口汇总 + daily 随 --days）")
+  .action(async (opts) => {
+    printJson(await client.analyticsSearchBrandSplit(Number(opts.days)));
   });
 
 analytics
   .command("search-keyword-breakdown")
-  .description("GSC 搜索词类型分布（品牌/品类/OEM 等）")
-  .action(async () => {
-    printJson(await client.analyticsSearchKeywordBreakdown());
+  .option("--days <n>", "period days", "28")
+  .description("GSC 搜索词类型分布（窗口汇总 + daily 随 --days）")
+  .action(async (opts) => {
+    printJson(await client.analyticsSearchKeywordBreakdown(Number(opts.days)));
   });
 
 analytics
@@ -342,24 +333,29 @@ analytics
 
 analytics
   .command("geo-countries")
+  .option("--days <n>", "period days", "28")
   .option("--limit <n>", "max rows", "20")
-  .description("GA4 国家分布（可分析口径）")
+  .description("GA4 国家分布（items=同步窗 Top；daily 随 --days）")
   .action(async (opts) => {
-    printJson(await client.analyticsGeoCountries(Number(opts.limit)));
+    printJson(
+      await client.analyticsGeoCountries(Number(opts.limit), Number(opts.days)),
+    );
   });
 
 analytics
   .command("geo-devices")
-  .description("GA4 设备分布（可分析口径）")
-  .action(async () => {
-    printJson(await client.analyticsGeoDevices());
+  .option("--days <n>", "period days", "28")
+  .description("GA4 设备分布（同步窗 Top）")
+  .action(async (opts) => {
+    printJson(await client.analyticsGeoDevices(Number(opts.days)));
   });
 
 analytics
   .command("geo-new-vs-returning")
-  .description("GA4 新老访客")
-  .action(async () => {
-    printJson(await client.analyticsGeoNewVsReturning());
+  .option("--days <n>", "period days", "28")
+  .description("GA4 新老访客（同步窗 Top）")
+  .action(async (opts) => {
+    printJson(await client.analyticsGeoNewVsReturning(Number(opts.days)));
   });
 
 analytics
@@ -381,7 +377,7 @@ analytics
 analytics
   .command("meta")
   .option("--days <n>", "period days", "28")
-  .description("看板元信息：数据模式、展示窗、各指标新鲜度")
+  .description("看板元信息：syncWindows、periodLinkage、数据模式与新鲜度")
   .action(async (opts) => {
     printJson(await client.analyticsMeta(Number(opts.days)));
   });
@@ -432,9 +428,17 @@ leads
   .command("stats")
   .option("--from <iso>")
   .option("--to <iso>")
-  .description("询盘聚合统计")
+  .description("询盘聚合统计（--from/--to 周期；无则全历史累计）")
   .action(async (opts) => {
     printJson(await client.leadsStats({ from: opts.from, to: opts.to }));
+  });
+
+leads
+  .command("stats-daily")
+  .option("--days <n>", "period days", "28")
+  .description("有效询盘按日（随所选周期，L0 主指标）")
+  .action(async (opts) => {
+    printJson(await client.leadsStatsDaily(Number(opts.days)));
   });
 
 leads

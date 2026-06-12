@@ -167,6 +167,10 @@ export class AopiyaClient {
     return this.request(`/leads/stats${suffix}`);
   }
 
+  leadsStatsDaily(periodDays = 28) {
+    return this.request(`/leads/stats/daily?periodDays=${periodDays}`);
+  }
+
   leadGet(id: string) {
     return this.request(`/leads/${id}`);
   }
@@ -223,28 +227,20 @@ export class AopiyaClient {
     return this.request(`/analytics/channels/performance?periodDays=${periodDays}`);
   }
 
-  analyticsTouchpoints(limit = 20) {
-    return this.request(`/analytics/touchpoints?limit=${limit}`);
-  }
-
-  analyticsTrackingEvents(periodDays = 28, limit = 50) {
+  analyticsTouchpoints(limit = 20, periodDays = 28) {
     return this.request(
-      `/analytics/tracking-events?periodDays=${periodDays}&limit=${limit}`,
+      `/analytics/touchpoints?limit=${limit}&periodDays=${periodDays}`,
     );
   }
 
-  analyticsScrollDepth(periodDays = 28, limit = 100) {
+  analyticsScrollEngagement(limit = 15, periodDays = 28) {
     return this.request(
-      `/analytics/scroll-depth?periodDays=${periodDays}&limit=${limit}`,
+      `/analytics/scroll-engagement?limit=${limit}&periodDays=${periodDays}`,
     );
   }
 
-  analyticsScrollEngagement(limit = 15) {
-    return this.request(`/analytics/scroll-engagement?limit=${limit}`);
-  }
-
-  analyticsAiReferrals() {
-    return this.request("/analytics/ai-referrals");
+  analyticsAiReferrals(periodDays = 28) {
+    return this.request(`/analytics/ai-referrals?periodDays=${periodDays}`);
   }
 
   analyticsContentLeadShare(periodDays = 28) {
@@ -279,40 +275,50 @@ export class AopiyaClient {
     return this.request(`/analytics/traffic/compare?periodDays=${periodDays}`);
   }
 
-  searchQueries(limit = 20) {
-    return this.request(`/analytics/search/queries?limit=${limit}`);
+  searchQueries(limit = 20, periodDays = 28) {
+    return this.request(
+      `/analytics/search/queries?limit=${limit}&periodDays=${periodDays}`,
+    );
   }
 
-  searchPages(limit = 20) {
-    return this.request(`/analytics/search/pages?limit=${limit}`);
+  searchPages(limit = 20, periodDays = 28) {
+    return this.request(
+      `/analytics/search/pages?limit=${limit}&periodDays=${periodDays}`,
+    );
   }
 
   analyticsSearchTrend(periodDays = 28) {
     return this.request(`/analytics/search/trend?periodDays=${periodDays}`);
   }
 
-  analyticsSearchBrandSplit() {
-    return this.request("/analytics/search/brand-split");
+  analyticsSearchBrandSplit(periodDays = 28) {
+    return this.request(`/analytics/search/brand-split?periodDays=${periodDays}`);
   }
 
-  analyticsSearchKeywordBreakdown() {
-    return this.request("/analytics/search/keyword-breakdown");
+  analyticsSearchKeywordBreakdown(periodDays = 28) {
+    return this.request(
+      `/analytics/search/keyword-breakdown?periodDays=${periodDays}`,
+    );
   }
 
   analyticsSearchKeywordTrend(periodDays = 28) {
     return this.request(`/analytics/search/keyword-trend?periodDays=${periodDays}`);
   }
 
-  analyticsGeoCountries(limit = 20) {
-    return this.request(`/analytics/geo/countries?limit=${limit}`);
+  analyticsGeoCountries(limit = 20, periodDays = 28) {
+    return this.request(
+      `/analytics/geo/countries?limit=${limit}&periodDays=${periodDays}`,
+    );
   }
 
-  analyticsGeoDevices() {
-    return this.request("/analytics/geo/devices");
+  analyticsGeoDevices(periodDays = 28) {
+    return this.request(`/analytics/geo/devices?periodDays=${periodDays}`);
   }
 
-  analyticsGeoNewVsReturning() {
-    return this.request("/analytics/geo/new-vs-returning");
+  analyticsGeoNewVsReturning(periodDays = 28) {
+    return this.request(
+      `/analytics/geo/new-vs-returning?periodDays=${periodDays}`,
+    );
   }
 
   analyticsVercelBaseline(periodDays = 28) {

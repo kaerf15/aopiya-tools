@@ -1,5 +1,9 @@
 # 分析积木与灵活切片
 
+## 叙事分层（先读）
+
+各 Tab 分析遵循 **L0 业务成果 → L5 数据可信** 六层叙事；每份报告至少包含一层 **日趋势**（`daily`），窗口 Top 仅作排名。详见 `../references/narrative-layers.md`。
+
 ## 三种取数方式
 
 | 方式 | 何时用 | 示例 |
@@ -12,7 +16,8 @@
 
 ## 时间窗
 
-- **滚动 N 天**：多数命令 `--days N`（默认 28）。基于「今天往前 N 天」切日序列。
+- **仅三档周期**：`7`（周报）、`28`（月报，默认）、`90`（季度）。与看板工具栏一致；传其它 `--days` 会归并到 28。
+- **滚动 N 天**：多数命令 `--days N`，基于「今天往前 N 天」切日序列与窗口 Top。
 - **近 7 vs 前 7 环比**：`aopiya analytics traffic-wow`（固定 7 天窗）。
 - **近 N vs 前 N 环比**：`aopiya analytics traffic-compare --days N`。
 - **自然月**：
@@ -26,11 +31,21 @@
 - **禁止**用全量减可分析、或混口径算占比（**例外**：`coverage` 覆盖率，仅在日期重叠窗内）。
 - **有效询盘**以 `leads` 库为准；GA4 `generate_lead` 仅对账。
 
+## 读数三层（CLI 与看板一致）
+
+| 层级 | `periodDays` / `--days` | 典型字段 |
+|------|-------------------------|----------|
+| 随所选周期 | ✅ 裁剪 | `traffic.data`、`*.daily`、`search-trend.totals`、`leads stats-daily` |
+| 同步窗 Top | ❌ 仅 daily 变 | `channels.rows`、`gsc-queries.items`、`funnel.steps`（中间步） |
+| 累计 | ❌ | `vercel-baseline.items`、`uniqueDevices`、无 `--from` 的 `leads stats` |
+
+先 `aopiya analytics meta --days N`：看 `syncWindows.*.spanDays` 与 `periodLinkage.relation`（`narrower` / `wider` / `aligned`）。
+
 ## 窗口 vs 日维度
 
 | 字段 | 含义 | 典型用途 |
 |------|------|----------|
-| `rows` / `items` | 上次 sync 的 **N 天窗口 Top 汇总** | 看板同款排名表 |
+| `rows` / `items` | 上次 sync 的 **Top 汇总**（绑 `meta.syncWindows`） | 看板同款排名表 |
 | `daily` | **按日分桶**（`*_daily` 快照，长期积累） | 趋势、自然月聚合、按日下钻 |
 | `dimensionsDaily` | Vercel 按日 paths/referrers/countries/locales | 全量口径日趋势与分维度 |
 

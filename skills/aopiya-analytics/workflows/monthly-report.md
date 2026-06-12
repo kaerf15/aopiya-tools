@@ -54,7 +54,11 @@ aopiya analytics channel-performance --days 28
 ```markdown
 # AOPIYA 独立站月报（{YYYY-MM}）
 
-## 核心 KPI
+### 读数口径
+- `aopiya analytics meta --days 28`（或 90）：写明 `syncWindows` 与 `periodLinkage.relation`
+- 自然月 KPI【随所选周期】= 日序列筛月聚合；渠道/词表/页面 Top【同步窗 Top】= 注明 sync 窗日期，勿与月合计直接对比
+
+## 核心 KPI【随所选周期】
 | 指标 | 本月 | 上月环比 | 口径 |
 |------|------|----------|------|
 | 有效询盘 | | | leads 库 |
@@ -63,13 +67,13 @@ aopiya analytics channel-performance --days 28
 | GSC 点击 | | | GSC 日序列聚合 |
 
 ## 获客结构
-{channel-performance 摘要 + byLocale 询盘}
+{channel-performance【同步窗 Top】摘要 + byLocale 询盘【周期】}
 
 ## SEO
-{search-trend 月合计 + brand-split + 机会词 Top5}
+{search-trend 月合计【周期】+ brand-split【同步窗】+ 机会词 Top5【同步窗】}
 
 ## 内容与转化
-{content-performance Top10 + 内容带动询盘占比}
+{content-performance【同步窗+周期询盘】Top10 + 内容带动询盘占比【周期】}
 
 ## 洞察与下月计划
 1. ...

@@ -5,6 +5,21 @@
 - **计算配方**：`../workflows/`（与 Admin 看板对齐）
 - **本文件**：站内报告**怎么写**、SEO/内容工作流
 
+## 动笔前先读 meta（读数三层）
+
+任何 Tab 报告或周报/月报，**第一步**执行：
+
+```bash
+aopiya analytics meta --days {7|28|90}
+```
+
+在正文开头写明：
+
+- `syncWindows.ga4` / `syncWindows.gscQueries` 的 `periodStart`~`periodEnd` 与 `spanDays`
+- `periodLinkage.relation`：`narrower`（常见 90 天）、`wider`（常见 7 天）、`aligned`（常见 28 天）
+
+正文各段标题用看板同款标注：**【随所选周期】**（日趋势/周期 KPI）、**【同步窗 Top】**（排名表）、**【累计】**（全历史/Vercel Top）。详见 `narrative-layers.md`。
+
 ## 站内报告结构（六段）
 
 1. **总览**：询盘、双口径访问、转化、健康度
