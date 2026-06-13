@@ -29,6 +29,7 @@
 ## 数据注意
 
 - **时间**：库内与 API 的 `createdAt`、`syncedAt`、`updatedAt` 等均为 **北京时间 ISO 8601**（后缀 `+08:00`）；日维度 `date` / `periodStart` 为北京日历日。CLI 直接输出 API JSON，展示可用 `@aopiya/sdk` 的 `formatBeijingDateTime`。
+- **测试数据**：删测试询盘后若漏斗仍残留感谢页（`confirm_lead` > 询盘库当日条数），在站点仓库执行 `pnpm clean-orphan-funnel -- --apply`（按日对账扣减，勿手改 payload）。
 
 - 每个 `source + metric` **仅一条当前状态**（覆盖写入，无历史审计快照）；`aopiya analytics snapshots` 列出这些状态行。
 - **日序列（traffic、search_trend 等）**：每次 sync 拉滚动窗，按 `date` 覆盖合并，长期积累。
@@ -107,5 +108,5 @@
 | `aopiya leads stats` | `{ total, bySourcePage: {路径: 数量}, byLocale: {语种: 数量}, from?, to? }` |
 | `aopiya leads stats-daily` | `{ periodDays, period, total, daily[{date, count}] }` — L0 询盘日趋势（询盘库全量） |
 
-时间均为 ISO 8601 UTC 字符串；`sourcePage` / `page_path` 为站内路径（带语种前缀，归并规则见上节）。
+时间均为 ISO 8601 **北京时间**（`+08:00`）；`sourcePage` / `page_path` 为站内路径（带语种前缀，归并规则见上节）。
 其余命令结构自描述，跑一次看输出即可；语义不明的字段对照本表理解。

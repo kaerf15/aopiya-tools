@@ -52,7 +52,7 @@ aopiya health
 | Vercel Drain | {有/无 live 数据} |
 
 ### 新鲜度
-- GA4 traffic 最近更新：{createdAt}
+- GA4 traffic 最近更新：{createdAt}（北京时间 `+08:00`，展示可用 SDK `formatBeijingDateTime`）
 - GSC search_trend：{createdAt}
 - 展示窗【随所选周期】：近 {N} 天 {displayPeriod.start}~{end}
 - 同步窗 Top 窗：GA4 {syncWindows.ga4}；GSC {syncWindows.gscQueries}
@@ -77,3 +77,4 @@ aopiya health
 
 - 单指标深挖：`snapshots --metric X --source Y --limit 1` 看完整 payload。
 - 升级前若 snapshots 同指标存在多条状态：联系站点运维做一次性状态合并，再 `aopiya analytics sync`。
+- 删测试询盘后 `reconcile` 仍偏高、或漏斗 `confirm_lead` 多于库：站点仓库 `pnpm clean-orphan-funnel -- --apply`（按日对账，勿手改快照）。

@@ -72,6 +72,8 @@ aopiya content bulk --file items.json
 
 多语言流程、body 结构、媒体规范见 `references/publishing-guide.md`。
 
+**时间字段**：`createdAt` / `updatedAt` / `publishedAt` 均为北京时间 ISO（`+08:00`），与 Admin 看板一致。
+
 ## 权限
 
 | 操作 | 所需 scope |

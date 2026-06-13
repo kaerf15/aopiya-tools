@@ -63,6 +63,8 @@ aopiya-analytics/
 
 双口径不可混减；漏斗终点以询盘库为准。详见 `metrics.md`。
 
+**时间**：API/库内时间戳为北京时间（`+08:00`）；CLI 展示可用 `@aopiya/sdk` 的 `formatBeijingDateTime`。
+
 ## 分析周期（7 / 28 / 90）
 
 看板与 CLI **仅三档**：`7` 周报 · `28` 月报（默认）· `90` 季度。切换后 **日趋势 / 周期 KPI** 联动；**窗口 Top（rows/items）** 绑上次 sync 窗不重算。读数三层见 `references/narrative-layers.md`；`aopiya analytics meta --days N` 返回 `syncWindows` 与 `periodLinkage`。
