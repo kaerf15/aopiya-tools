@@ -53,7 +53,7 @@
 - `list` 返回 `{ count, items: [内容行] }`
 - `delete` 返回 `{ id, type, slug, deleted: true }`
 - `bulk` 返回 `{ count, results: [{ type, id, slug, published, error? }] }`
-- 时间均为 ISO 8601 UTC 字符串。
+- 时间均为 ISO 8601 **北京时间**（`Asia/Shanghai`，后缀 `+08:00`）。
 
 ## SEO 写作要点（发布前自检）
 

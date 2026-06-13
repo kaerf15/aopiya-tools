@@ -28,6 +28,8 @@
 
 ## 数据注意
 
+- **时间**：库内与 API 的 `createdAt`、`syncedAt`、`updatedAt` 等均为 **北京时间 ISO 8601**（后缀 `+08:00`）；日维度 `date` / `periodStart` 为北京日历日。CLI 直接输出 API JSON，展示可用 `@aopiya/sdk` 的 `formatBeijingDateTime`。
+
 - 每个 `source + metric` **仅一条当前状态**（覆盖写入，无历史审计快照）；`aopiya analytics snapshots` 列出这些状态行。
 - **日序列（traffic、search_trend 等）**：每次 sync 拉滚动窗，按 `date` 覆盖合并，长期积累。
 - **日 × 维度（`*_daily`）**：channels/pages/queries 等除窗口 Top 外，另有按日分桶快照（`overwrite_by_date_bucket`）；API 在 `daily` 字段返回。
