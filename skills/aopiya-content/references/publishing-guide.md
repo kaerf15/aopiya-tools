@@ -61,3 +61,29 @@
 - 正文唯一 H1；FAQ/步骤/对比尽量用列表与表格（利于 AI 搜索引用）。
 - 商品/文章内嵌入站内链接（相关商品、相关文章、/contact CTA）。
 - 图片 alt 写清品牌 + 品类 + 特征（如 "SUSEN genuine leather tote bag black"）。
+
+## 文章文内目录（`showToc`）
+
+长文默认显示 **CONTENTS** 目录，从正文 Markdown 标题自动提取：
+
+- 推荐章节标题：`##`（二级）、`###`（三级）；也支持 `####`
+- 字段：`data.showToc`（布尔，**默认 `true`**）
+- 关闭目录（短讯、单段）：`"showToc": false`
+- 各语种共用同一开关（写在英文 `data` 即可；Agent 译稿行保持一致）
+
+示例：
+
+```json
+{
+  "slug": "handbag-sourcing-tips",
+  "locale": "en",
+  "data": {
+    "title": "...",
+    "body": "## Section one\n\n...",
+    "showToc": true
+  },
+  "seo": { "title": "...", "description": "...", "noindex": false }
+}
+```
+
+发布前可 `aopiya content schema article` 查看完整 `data` 字段说明。
