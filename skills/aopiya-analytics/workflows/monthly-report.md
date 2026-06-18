@@ -5,8 +5,8 @@
 ## 时间边界
 
 ```text
-FROM = YYYY-MM-01T00:00:00.000Z
-TO   = 下月 01T00:00:00.000Z   # 不含下月首日
+FROM = YYYY-MM-01T00:00:00.000+08:00
+TO   = 下月 01T00:00:00.000+08:00   # 不含下月首日
 ```
 
 询盘（精确）：
@@ -34,8 +34,8 @@ aopiya analytics vercel-baseline --days 90
 ## 推荐命令包
 
 ```bash
-MONTH_FROM=2026-05-01T00:00:00.000Z
-MONTH_TO=2026-06-01T00:00:00.000Z
+MONTH_FROM=2026-05-01T00:00:00.000+08:00
+MONTH_TO=2026-06-01T00:00:00.000+08:00
 
 aopiya leads stats --from $MONTH_FROM --to $MONTH_TO
 aopiya analytics traffic --days 90          # → 聚合五月 sessions/users
