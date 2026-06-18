@@ -29,6 +29,8 @@
 ## 数据注意
 
 - **统计起点**：`meta.statsStartDate`（默认 `2026-06-13`，北京日历日）；该日 00:00 +08:00 之前的数据不入库、不出现在 API/看板；写报告勿自行推算测试期。
+- **CLI 自检**：`aopiya analytics stats-check` 校验 `statsStartDate` 与 `traffic` 日序列；`traffic` / `vercel-baseline` / `search-trend` / `leads stats-daily` 若含测试期日期会在 stderr 输出 `warning`。
+- **测试询盘清理**（站点运维，非 CLI）：`pnpm db:delete-test-data` 删除 E2E 邮箱/姓名及留言含「测试」/`test` 的询盘；`pnpm clean-orphan-funnel -- --apply` 对齐感谢页漏斗；`pnpm analytics:purge-pre-launch -- --apply` 清分析快照测试期日序列（均在 `aopiya_web` 仓库）。
 - 每个 `source + metric` **仅一条当前状态**（覆盖写入，无历史审计快照）；`aopiya analytics snapshots` 列出这些状态行。
 - **日序列（traffic、search_trend 等）**：每次 sync 拉滚动窗，按 `date` 覆盖合并，长期积累。
 - **日 × 维度（`*_daily`）**：channels/pages/queries 等除窗口 Top 外，另有按日分桶快照（`overwrite_by_date_bucket`）；API 在 `daily` 字段返回。
@@ -101,6 +103,7 @@
 | `aopiya analytics vercel-baseline` | `{ pageviewsTotal, uniqueDevices, daily[], dimensionsDaily[{date, paths, referrers, countries, locales}], items[], referrers[], countries[], locales[] }` |
 | `aopiya analytics coverage` | `{ vercelPageviews, ga4Sessions, overlapDays, ga4SessionsOverlap, vercelPageviewsOverlap, coverageRatio, vercelLastIngest }` |
 | `aopiya analytics meta` | `{ periodDays, periodPreset, displayPeriod, syncWindows{ga4,gscQueries}, periodLinkage, statsStartDate, dataMode, isLive, storage, ga4?, gscQueries?, gscSearchTrend?, configured, hint, syncedAt }` |
+| `aopiya analytics stats-check` | `{ ok, expectedStatsStartDate, statsStartDate, preStatsDatesInTraffic[], trafficPeriod? }` — 上线/周报前快速验数 |
 | `aopiya leads stats-daily` | `{ periodDays, period, total, daily[{date, count}] }` |
 | `aopiya leads list` | `{ count, items: [{id, name, country, company, phone, email, message, sourcePage, locale, utmSource, utmMedium, utmCampaign, createdAt}] }` |
 | `aopiya leads stats` | `{ total, bySourcePage: {路径: 数量}, byLocale: {语种: 数量}, from?, to? }` |

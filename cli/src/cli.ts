@@ -1,8 +1,9 @@
 #!/usr/bin/env node
-import { AopiyaApiError, AopiyaClient } from "@aopiya/sdk";
+import { AopiyaApiError, AopiyaClient, DEFAULT_ANALYTICS_STATS_START_DATE, datesBeforeStatsStart } from "@aopiya/sdk";
 import { Command } from "commander";
 import { readFileSync, writeFileSync } from "node:fs";
 import { createRequire } from "node:module";
+import { warnPreStatsDates } from "./stats-warn.js";
 
 const pkg = createRequire(import.meta.url)("../package.json") as { version: string };
 
@@ -135,9 +136,39 @@ const analytics = program.command("analytics").description("GA4/GSC 快照与分
 analytics
   .command("traffic")
   .option("--days <n>", "period days", "28")
-  .description("近 N 天流量日序列（当前状态）")
+  .description("近 N 天可分析访问日序列（不含统计起点前的测试期；见 statsStartDate）")
   .action(async (opts) => {
-    printJson(await client.analyticsTraffic(Number(opts.days)));
+    const data = (await client.analyticsTraffic(Number(opts.days))) as {
+      statsStartDate?: string;
+      data?: { date: string }[];
+    };
+    warnPreStatsDates("traffic", data.data, data.statsStartDate);
+    printJson(data);
+  });
+
+analytics
+  .command("stats-check")
+  .option("--days <n>", "period days", "28")
+  .description("校验 meta.statsStartDate 与 traffic 日序列是否含测试期日期")
+  .action(async (opts) => {
+    const days = Number(opts.days);
+    const [meta, traffic] = await Promise.all([
+      client.analyticsMeta(days),
+      client.analyticsTraffic(days),
+    ]);
+    const m = meta as { statsStartDate?: string };
+    const t = traffic as { statsStartDate?: string; data?: { date: string }[] };
+    const start = m.statsStartDate ?? t.statsStartDate ?? DEFAULT_ANALYTICS_STATS_START_DATE;
+    const preStats = datesBeforeStatsStart(t.data ?? [], start);
+    printJson({
+      ok:
+        start === DEFAULT_ANALYTICS_STATS_START_DATE &&
+        preStats.length === 0,
+      expectedStatsStartDate: DEFAULT_ANALYTICS_STATS_START_DATE,
+      statsStartDate: start,
+      preStatsDatesInTraffic: preStats,
+      trafficPeriod: (t as { period?: { start: string; end: string } }).period,
+    });
   });
 
 analytics
@@ -324,7 +355,11 @@ analytics
   .option("--days <n>", "period days", "28")
   .description("GSC 搜索点击/展示日趋势")
   .action(async (opts) => {
-    printJson(await client.analyticsSearchTrend(Number(opts.days)));
+    const data = (await client.analyticsSearchTrend(Number(opts.days))) as {
+      rows?: { date: string }[];
+    };
+    warnPreStatsDates("search-trend", data.rows);
+    printJson(data);
   });
 
 analytics
@@ -383,7 +418,11 @@ analytics
   .option("--days <n>", "period days", "28")
   .description("Vercel 全量 PV、日趋势、Top 路径/来源/国家/语种")
   .action(async (opts) => {
-    printJson(await client.analyticsVercelBaseline(Number(opts.days)));
+    const data = (await client.analyticsVercelBaseline(Number(opts.days))) as {
+      daily?: { date: string }[];
+    };
+    warnPreStatsDates("vercel-baseline", data.daily);
+    printJson(data);
   });
 
 analytics
@@ -397,9 +436,24 @@ analytics
 analytics
   .command("meta")
   .option("--days <n>", "period days", "28")
-  .description("看板元信息：syncWindows、periodLinkage、数据模式与新鲜度")
+  .description("看板元信息：statsStartDate、syncWindows、periodLinkage、数据模式与新鲜度")
   .action(async (opts) => {
-    printJson(await client.analyticsMeta(Number(opts.days)));
+    const data = (await client.analyticsMeta(Number(opts.days))) as {
+      statsStartDate?: string;
+    };
+    if (data.statsStartDate && data.statsStartDate !== DEFAULT_ANALYTICS_STATS_START_DATE) {
+      console.error(
+        JSON.stringify(
+          {
+            warning: `statsStartDate=${data.statsStartDate}，预期 ${DEFAULT_ANALYTICS_STATS_START_DATE}`,
+            hint: "在 Vercel 设置 ANALYTICS_STATS_START_DATE=2026-06-13 并重新部署",
+          },
+          null,
+          2,
+        ),
+      );
+    }
+    printJson(data);
   });
 
 analytics
@@ -423,9 +477,9 @@ const leads = program.command("leads").description("询盘");
 leads
   .command("list")
   .option("--source <page>", "source_page 模糊匹配")
-  .option("--from <iso>", "created_at 起（ISO）")
+  .option("--from <iso>", "created_at 起（ISO，不早于统计起点）")
   .option("--to <iso>", "created_at 止（ISO）")
-  .description("询盘明细")
+  .description("询盘明细（不含统计起点 2026-06-13 前的记录）")
   .action(async (opts) => {
     printJson(
       await client.leadsList({
@@ -456,9 +510,13 @@ leads
 leads
   .command("stats-daily")
   .option("--days <n>", "period days", "28")
-  .description("有效询盘按日（随所选周期，L0 主指标）")
+  .description("有效询盘按日（随所选周期；列表不含统计起点前测试询盘）")
   .action(async (opts) => {
-    printJson(await client.leadsStatsDaily(Number(opts.days)));
+    const data = (await client.leadsStatsDaily(Number(opts.days))) as {
+      daily?: { date: string }[];
+    };
+    warnPreStatsDates("leads stats-daily", data.daily);
+    printJson(data);
   });
 
 leads

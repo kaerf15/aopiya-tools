@@ -9,6 +9,7 @@
 ```bash
 DAYS=28
 
+aopiya analytics stats-check --days $DAYS
 aopiya analytics meta --days $DAYS
 aopiya analytics snapshots --no-payload --limit 40
 aopiya analytics vercel-baseline --days $DAYS
@@ -23,6 +24,7 @@ aopiya health
 
 ### 状态与配置
 
+0. **统计起点**：`stats-check.ok === true` 且 `statsStartDate === 2026-06-13`；否则先联系运维修正环境变量并清库（见 `metrics.md` 测试询盘清理）。
 1. **模式与展示窗**：`meta.dataMode`、`displayPeriod`、`ga4`/`gscSearchTrend` 库内日序列。
 2. **配置清单**：`meta.configured` — GA4、GSC、gtag、Vercel Drain。
 3. **指标状态表**：`snapshots.items` — `merge`、`rowCount`、`createdAt`；核对 `*_daily` 是否存在。

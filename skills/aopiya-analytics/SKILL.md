@@ -100,6 +100,7 @@ aopiya analytics vercel-baseline --days 28  # daily + dimensionsDaily
 | SEO | `aopiya analytics search-trend` / `gsc-queries` / `search-brand-split`… |
 | 获客 | `aopiya analytics geo-countries` / `geo-devices` / `ai-referrals` |
 | 全量 / 覆盖 | `aopiya analytics vercel-baseline` / `coverage` / `meta` |
+| **统计起点验数** | `aopiya analytics stats-check`（上线/周报前） |
 | 对账 / 同步 | `aopiya analytics reconcile` / `sync`（勿高频） |
 | 询盘 | `aopiya leads list` / `stats` / `stats-daily` / `export` |
 | 审计 | `aopiya audit run` / `audit sitemap` / `audit links` |
