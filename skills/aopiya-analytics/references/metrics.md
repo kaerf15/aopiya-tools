@@ -29,6 +29,7 @@
 ## 数据注意
 
 - **统计起点**：`meta.statsStartDate`（默认 `2026-06-13`，北京日历日）；该日 00:00 +08:00 之前的数据不入库、不出现在 API/看板；写报告勿自行推算测试期。
+- **Cookie 同意**：站点底部横幅（非全屏阻断）；`cookie_consent_choice` 事件在「接受分析」与「仅必要」时均上报（GA4 Consent Mode）；后台「数据健康」与 `tracking-events` 可查看按日趋势。
 - **CLI 自检**：`aopiya analytics stats-check` 校验 `statsStartDate` 与 `traffic` 日序列；`traffic` / `vercel-baseline` / `search-trend` / `leads stats-daily` 若含测试期日期会在 stderr 输出 `warning`。
 - **测试询盘清理**（站点运维，非 CLI）：`pnpm db:delete-test-data` 删除 E2E 邮箱/姓名及留言含「测试」/`test` 的询盘；`pnpm clean-orphan-funnel -- --apply` 对齐感谢页漏斗；`pnpm analytics:purge-pre-launch -- --apply` 清分析快照测试期日序列（均在 `aopiya_web` 仓库）。
 - 每个 `source + metric` **仅一条当前状态**（覆盖写入，无历史审计快照）；`aopiya analytics snapshots` 列出这些状态行。
